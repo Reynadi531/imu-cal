@@ -1,5 +1,6 @@
 import dearpygui.dearpygui as dpg
 import loader.sensor_formatter as sensor_formatter
+import loader.serial_loader as serial_loader
 import threading
 
 reading = False
@@ -15,6 +16,12 @@ def _read_accelerometer_data_thread():
 
 def cb_start_reading():
     global reading, read_thread
+    if read_thread and read_thread.is_alive():
+        dpg.set_value("accel_status_text", "Status: Already Reading")
+        return
+    if not serial_loader.get_serial_instance().is_open:
+        dpg.set_value("accel_status_text", "Status: Serial Port Not Open")
+        return
     if not reading:
         reading = True
         dpg.set_value("accel_status_text", "Status: Reading...")
@@ -38,12 +45,13 @@ def create_accelerometer_tab():
             dpg.add_button(label="Start Read", tag="read_accel_data_button", callback=cb_start_reading)
             dpg.add_button(label="Stop Read", tag="stop_read_accel_data_button", callback=cb_stop_reading)
         dpg.add_text("Status: Not Reading", tag="accel_status_text")
-        with dpg.table(tag="accel_data_table", header_row=True, height=200, width=400):
-            dpg.add_table_column(label="X")
-            dpg.add_table_column(label="Y")
-            dpg.add_table_column(label="Z")
-            with dpg.table_row():
-                dpg.add_text("0.0", tag="accel_x_value")
-                dpg.add_text("0.0", tag="accel_y_value")
-                dpg.add_text("0.0", tag="accel_z_value")
+        with dpg.collapsing_header(label="Accelerometer Data", default_open=True):
+            with dpg.table(tag="accel_data_table", header_row=True, height=200, width=400):
+                dpg.add_table_column(label="X")
+                dpg.add_table_column(label="Y")
+                dpg.add_table_column(label="Z")
+                with dpg.table_row():
+                    dpg.add_text("0.0", tag="accel_x_value")
+                    dpg.add_text("0.0", tag="accel_y_value")
+                    dpg.add_text("0.0", tag="accel_z_value")
         
