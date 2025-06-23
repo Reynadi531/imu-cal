@@ -1,0 +1,56 @@
+
+import dearpygui.dearpygui as dpg
+import loader.sensor_formatter as sensor_formatter
+import loader.serial_loader as serial_loader
+import threading
+
+reading = False
+read_thread = None 
+
+def _read_gryoscope_data_thread():
+    global reading
+    while reading:
+        xyzgyro = sensor_formatter.read_sensor_data()['gyroscope']
+        dpg.set_value("gyro_x_value", f"{xyzgyro['x']:.2f}")
+        dpg.set_value("gyro_y_value", f"{xyzgyro['y']:.2f}")
+        dpg.set_value("gyro_z_value", f"{xyzgyro['z']:.2f}")
+
+def cb_start_reading():
+    global reading, read_thread
+    if read_thread and read_thread.is_alive():
+        dpg.set_value("gyro_status_text", "Status: Already Reading")
+        return
+    if not serial_loader.get_serial_instance().is_open:
+        dpg.set_value("gyro_status_text", "Status: Serial Port Not Open")
+        return
+    if not reading:
+        reading = True
+        dpg.set_value("gyro_status_text", "Status: Reading...")
+        read_thread = threading.Thread(target=_read_gryoscope_data_thread, daemon=True)
+        read_thread.start()
+
+def cb_stop_reading():
+    global reading
+    reading = False
+    if read_thread and read_thread.is_alive():
+        read_thread.join(timeout=1)
+    dpg.set_value("gyro_status_text", "Status: Not Reading")
+
+
+def create_gryoscope_tab():
+    with dpg.tab(label="Gryoscope", tag="gryoscope_tab"):
+        with dpg.group(horizontal=True):
+            dpg.add_text("Gryoscope Data:")
+            dpg.add_button(label="Start Read", tag="read_gyro_data_button", callback=cb_start_reading)
+            dpg.add_button(label="Stop Read", tag="stop_read_gyro_data_button", callback=cb_stop_reading)
+        dpg.add_text("Status: Not Reading", tag="gyro_status_text")
+        with dpg.collapsing_header(label="Gryoscope Data", default_open=True):
+            with dpg.table(tag="gyro_data_table", header_row=True, height=200, width=400):
+                dpg.add_table_column(label="X")
+                dpg.add_table_column(label="Y")
+                dpg.add_table_column(label="Z")
+                with dpg.table_row():
+                    dpg.add_text("0.0", tag="gyro_x_value")
+                    dpg.add_text("0.0", tag="gyro_y_value")
+                    dpg.add_text("0.0", tag="gyro_z_value")
+        

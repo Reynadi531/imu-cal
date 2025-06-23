@@ -2,6 +2,7 @@
 import dearpygui.dearpygui as dpg
 import components.config_tab as config_tab
 import components.accelerometer_tab as accelerometer_tab
+import components.gyroscope_tab as gyroscope_tab
 
 dpg.create_context()
 dpg.create_viewport(title="IMU Calibration Tools", width=800, height=600)
@@ -12,6 +13,7 @@ with dpg.window(label="IMU Calibration Tool", tag="main_window"):
     with dpg.tab_bar(tag="main_tab_bar"):
         config_tab.create_config_tab()
         accelerometer_tab.create_accelerometer_tab() 
+        gyroscope_tab.create_gryoscope_tab()
 
 dpg.set_primary_window("main_window", True)
 

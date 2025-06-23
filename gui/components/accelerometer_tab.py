@@ -9,7 +9,7 @@ read_thread = None
 def _read_accelerometer_data_thread():
     global reading
     while reading:
-        xyzAccel = sensor_formatter.read_accelerometer_data()
+        xyzAccel = sensor_formatter.read_sensor_data()['accelerometer']
         dpg.set_value("accel_x_value", f"{xyzAccel['x']:.2f}")
         dpg.set_value("accel_y_value", f"{xyzAccel['y']:.2f}")
         dpg.set_value("accel_z_value", f"{xyzAccel['z']:.2f}")
@@ -34,9 +34,6 @@ def cb_stop_reading():
     if read_thread and read_thread.is_alive():
         read_thread.join(timeout=1)
     dpg.set_value("accel_status_text", "Status: Not Reading")
-    dpg.set_value("accel_x_value", "0.0")
-    dpg.set_value("accel_y_value", "0.0")
-    dpg.set_value("accel_z_value", "0.0")
 
 def create_accelerometer_tab():
     with dpg.tab(label="Accelerometer", tag="accelerometer_tab"):
