@@ -7,7 +7,7 @@ import threading
 reading = False
 read_thread = None 
 
-def _read_gryoscope_data_thread():
+def _read_Gyroscope_data_thread():
     global reading
     while reading:
         xyzgyro = sensor_formatter.read_sensor_data()['gyroscope']
@@ -26,7 +26,7 @@ def cb_start_reading():
     if not reading:
         reading = True
         dpg.set_value("gyro_status_text", "Status: Reading...")
-        read_thread = threading.Thread(target=_read_gryoscope_data_thread, daemon=True)
+        read_thread = threading.Thread(target=_read_Gyroscope_data_thread, daemon=True)
         read_thread.start()
 
 def cb_stop_reading():
@@ -36,15 +36,14 @@ def cb_stop_reading():
         read_thread.join(timeout=1)
     dpg.set_value("gyro_status_text", "Status: Not Reading")
 
-
-def create_gryoscope_tab():
-    with dpg.tab(label="Gryoscope", tag="gryoscope_tab"):
+def create_gyroscope_tab():
+    with dpg.tab(label="Gyroscope", tag="Gyroscope_tab"):
         with dpg.group(horizontal=True):
-            dpg.add_text("Gryoscope Data:")
+            dpg.add_text("Gyroscope Data:")
             dpg.add_button(label="Start Read", tag="read_gyro_data_button", callback=cb_start_reading)
             dpg.add_button(label="Stop Read", tag="stop_read_gyro_data_button", callback=cb_stop_reading)
         dpg.add_text("Status: Not Reading", tag="gyro_status_text")
-        with dpg.collapsing_header(label="Gryoscope Data", default_open=True):
+        with dpg.collapsing_header(label="Gyroscope Data", default_open=True):
             with dpg.table(tag="gyro_data_table", header_row=True, height=200, width=400):
                 dpg.add_table_column(label="X")
                 dpg.add_table_column(label="Y")
