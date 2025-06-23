@@ -1,10 +1,9 @@
 import dearpygui.dearpygui as dpg
 import loader.sensor_formatter as sensor_formatter
 import threading
-import time # For simulating sensor reading delay
 
 reading = False
-read_thread = None # To hold the reference to the reading thread
+read_thread = None 
 
 def _read_accelerometer_data_thread():
     global reading
@@ -13,7 +12,6 @@ def _read_accelerometer_data_thread():
         dpg.set_value("accel_x_value", f"{xyzAccel['x']:.2f}")
         dpg.set_value("accel_y_value", f"{xyzAccel['y']:.2f}")
         dpg.set_value("accel_z_value", f"{xyzAccel['z']:.2f}")
-        # time.sleep(0.1) 
 
 def cb_start_reading():
     global reading, read_thread
