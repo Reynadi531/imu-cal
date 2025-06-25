@@ -104,3 +104,35 @@ def stop_sensor_reading():
             print(f"Error stopping sensor reading: {e}")
     else:
         print("Serial port is not open.")
+
+def send_calibration_accelerometer(xMin, xMax, yMin, yMax, zMin, zMax):
+    global serial_instance
+    if serial_instance.is_open:
+        try:
+            command = f"setCorrectionAccel {xMin} {xMax} {yMin} {yMax} {zMin} {zMax}\n"
+            serial_instance.write(command.encode('utf-8'))
+            res = serial_instance.readline().decode('utf-8').strip()
+            if res == "OK":
+                print("Calibration accelerometer command sent successfully.")
+            else:
+                print(f"Failed to send calibration accelerometer command: {res}") 
+        except Exception as e:
+            print(f"Error sending calibration accelerometer command: {e}")
+    else:
+        print("Serial port is not open.")
+
+def send_calibration_gyroscope(xOffset, yOffset, zOffset):
+    global serial_instance
+    if serial_instance.is_open:
+        try:
+            command = f"setCorrectionGyro {xOffset} {yOffset} {zOffset}\n"
+            serial_instance.write(command.encode('utf-8'))
+            res = serial_instance.readline().decode('utf-8').strip()
+            if res == "OK":
+                print("Calibration gyroscope command sent successfully.")
+            else:
+                print(f"Failed to send calibration gyroscope command: {res}")
+        except Exception as e:
+            print(f"Error sending calibration gyroscope command: {e}")
+    else:
+        print("Serial port is not open.")

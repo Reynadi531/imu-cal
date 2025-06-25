@@ -12,3 +12,7 @@ Run the GUI
 ```bash
 python gui
 ```
+
+## GUI Looks 
+
+![Main GUI](https://i.imgur.com/dRPfLQM.png)

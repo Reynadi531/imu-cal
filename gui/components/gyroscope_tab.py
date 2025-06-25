@@ -76,24 +76,34 @@ def cb_record_continuously_gyro_data():
         dpg.set_value("recorded_data_count_gyro", f"Recorded Data: {cal_gyro.count_records()}")
         time.sleep(0.3)
 
+def cb_send_offsets():
+    offset = dpg.get_value("offset_value_input")
+    if offset:
+        try:
+            x, y, z = map(float, offset.split(','))
+            sensor_formatter.send_calibration_gyroscope(x, y, z)
+        except ValueError:
+            dpg.set_value("offset_value_text", "Invalid offset format. Use 'x, y, z' format.")
+    else:
+        dpg.set_value("offset_value_text", "No offset provided.")
+
 def create_gyroscope_tab():
     with dpg.tab(label="Gyroscope", tag="Gyroscope_tab"):
-        with dpg.collapsing_header(label="Gyroscope Data", default_open=True):
-            with dpg.group(horizontal=True):
-                dpg.add_text("Gyroscope Data:")
-                dpg.add_button(label="Read Once", tag="read_once_gyro_data_button", callback=cb_read_once_gyro_data)
-                dpg.add_button(label="Start Read", tag="read_gyro_data_button", callback=cb_start_reading)
-                dpg.add_button(label="Stop Read", tag="stop_read_gyro_data_button", callback=cb_stop_reading)
-                dpg.add_text("Status: Not Reading", tag="gyro_status_text")
-            with dpg.collapsing_header(label="Gyroscope Data", default_open=True):
-                with dpg.table(tag="gyro_data_table", header_row=True, height=200, width=400):
-                    dpg.add_table_column(label="X")
-                    dpg.add_table_column(label="Y")
-                    dpg.add_table_column(label="Z")
-                    with dpg.table_row():
-                        dpg.add_text("0.0", tag="gyro_x_value")
-                        dpg.add_text("0.0", tag="gyro_y_value")
-                        dpg.add_text("0.0", tag="gyro_z_value")
+        with dpg.group(horizontal=True):
+            dpg.add_text("Gyroscope Data:")
+            dpg.add_button(label="Read Once", tag="read_once_gyro_data_button", callback=cb_read_once_gyro_data)
+            dpg.add_button(label="Start Read", tag="read_gyro_data_button", callback=cb_start_reading)
+            dpg.add_button(label="Stop Read", tag="stop_read_gyro_data_button", callback=cb_stop_reading)
+            dpg.add_text("Status: Not Reading", tag="gyro_status_text")
+        with dpg.collapsing_header(label="Gyroscope Data Raw", default_open=True):
+            with dpg.table(tag="gyro_data_table", header_row=True, height=200, width=400):
+                dpg.add_table_column(label="X")
+                dpg.add_table_column(label="Y")
+                dpg.add_table_column(label="Z")
+                with dpg.table_row():
+                    dpg.add_text("0.0", tag="gyro_x_value")
+                    dpg.add_text("0.0", tag="gyro_y_value")
+                    dpg.add_text("0.0", tag="gyro_z_value")
         with dpg.collapsing_header(label="Calibration", default_open=True):
             with dpg.group():
                 dpg.add_text("Calibration Data:")
@@ -115,3 +125,5 @@ def create_gyroscope_tab():
             with dpg.group(horizontal=True):
                 dpg.add_text("Offeset value: ", tag="offset_value_text")
                 dpg.add_input_text(readonly=True, tag="offset_value_input", width=400, default_value="0.0, 0.0, 0.0")
+            with dpg.group(horizontal=True):
+                dpg.add_button(label="Send Offsets", tag="send_offsets_button_gyro", callback=cb_send_offsets)

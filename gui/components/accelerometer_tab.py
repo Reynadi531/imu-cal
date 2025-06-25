@@ -57,7 +57,7 @@ def cb_record_once_accel_data():
 def cb_record_continuously_accel_data():
     global recordContinously
     count = dpg.get_value("calibration_record_count")
-    recordContinously = not recordContinously
+    recordContinously = True
     for _ in range(count):
         if not recordContinously:
             break
@@ -69,6 +69,7 @@ def cb_record_continuously_accel_data():
         cal_accel.add_record(accel_data['x'], accel_data['y'], accel_data['z'])
         dpg.set_value("recorded_data_count", f"Recorded Data: {cal_accel.count_records()}")
         time.sleep(0.3)  
+    recordContinously = False
 
 def cb_get_min_max():
     min_max_values = cal_accel.getMinMax()
@@ -77,9 +78,16 @@ def cb_get_min_max():
     else:
         dpg.set_value("min_max_values_input", "No records available")
 
+def cb_send_offsets():
+    offsets = cal_accel.getMinMax()
+    if offsets:
+        sensor_formatter.send_calibration_accelerometer(offsets[0], offsets[1], offsets[2], offsets[3], offsets[4], offsets[5])
+    else:
+        dpg.set_value("min_max_values_input", "No records available")
+
 def create_accelerometer_tab():
     with dpg.tab(label="Accelerometer", tag="accelerometer_tab"):
-        with dpg.collapsing_header(label="Accelerometer Data", default_open=True):
+        with dpg.collapsing_header(label="Accelerometer Data Raw", default_open=True):
             with dpg.group(horizontal=True):
                 dpg.add_text("Accelerometer Data:")
                 dpg.add_button(label="Read Once", tag="read_once_accel_data_button", callback=cb_read_once_accel_data)
@@ -115,4 +123,6 @@ def create_accelerometer_tab():
             with dpg.group(horizontal=True):
                 dpg.add_text("Min/Max Values: ", tag="min_max_values_text")
                 dpg.add_input_text(readonly=True, tag="min_max_values_input", width=400, default_value="0.0, 0.0, 0.0, 0.0, 0.0, 0.0")
+            with dpg.group(horizontal=True):
+                dpg.add_button(label="Send Offsets", tag="send_offsets_button", callback=cb_send_offsets)
         
